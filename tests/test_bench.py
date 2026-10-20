@@ -87,6 +87,16 @@ class GraderTests(unittest.TestCase):
             os.unlink(tasks)
             os.unlink(run)
 
+    def test_attempted_only_skips_unanswered_tasks(self):
+        tasks = write_jsonl([good_task(), good_task(id="T2", answer="2019-10-14", answer_type="date")])
+        run = write_jsonl([{"id": "T1", "answer": "Lukasz Langa"}])
+        try:
+            results, _ = grade(tasks, run, attempted_only=True)
+            self.assertEqual([(r[0], r[1]) for r in results], [("T1", True)])
+        finally:
+            os.unlink(tasks)
+            os.unlink(run)
+
 
 if __name__ == "__main__":
     unittest.main()
