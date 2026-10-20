@@ -1,8 +1,9 @@
 """Grade a model's answers against the answer keys.
 
-Usage: python scripts/grade.py tasks/tasks.jsonl runs/<model>.jsonl
+Usage: python scripts/grade.py [--attempted] tasks/tasks.jsonl runs/<model>.jsonl
 A run file has one line per task: {"id": "T001", "answer": "..."}.
-Missing answers count as failures. Exits 1 if any task fails.
+Missing answers count as failures, unless --attempted is given, which grades
+only the tasks the run answered (for partial runs). Exits 1 if any task fails.
 """
 
 import sys
@@ -12,9 +13,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 from common import is_correct, load_jsonl  # noqa: E402
 
 
-def grade(tasks_path, run_path):
+def grade(tasks_path, run_path, attempted_only=False):
     tasks = {t["id"]: t for _, t in load_jsonl(tasks_path)}
     answers = {r["id"]: r.get("answer") for _, r in load_jsonl(run_path)}
+    if attempted_only:
+        tasks = {tid: t for tid, t in tasks.items() if tid in answers}
     results = []
     for tid, task in tasks.items():
         given = answers.get(tid)
@@ -25,10 +28,12 @@ def grade(tasks_path, run_path):
 
 
 def main(argv):
-    if len(argv) != 3:
+    attempted_only = "--attempted" in argv
+    args = [a for a in argv[1:] if a != "--attempted"]
+    if len(args) != 2:
         print(__doc__)
         return 2
-    results, unknown = grade(argv[1], argv[2])
+    results, unknown = grade(args[0], args[1], attempted_only)
     for tid, ok, given, want in results:
         if ok:
             print(f"PASS {tid}")
