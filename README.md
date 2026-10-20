@@ -80,4 +80,9 @@ For each failed task, copy `reviews/TEMPLATE.md` to `reviews/<task-id>-<model>.m
 
 | Model | Date | Score | Main failure modes |
 |---|---|---|---|
-| _(add runs here)_ | | | |
+| Google AI Mode | 2026-10-20 | 5/5 attempted (T002–T006) | None: every answer correct, citing the PEP or RFC pages. T005 was asked in a reworded form (see the run file). |
+| Claude Opus 5.5 (chat, web search) | 2026-10-20 | 1/1 attempted (T003) | None: correct at Medium and High effort. |
+
+Grade a partial run with `python scripts/grade.py --attempted tasks/tasks.jsonl runs/<file>.jsonl`.
+
+**Takeaway so far:** live-search models solve these tasks because each hop sits on a well-indexed official page. Harder tasks need at least one hop whose fact is buried (inside a PDF, table or minutes) or that links sources that never reference each other.
